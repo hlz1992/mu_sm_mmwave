@@ -24,7 +24,6 @@ wu_set = dict()                         # User weights set
 for u_id in range(U):
     wu_set[u_id] = 1
 
-print(wu_set)
 
 
 
