@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from utils import *
-from numpy import pi, log2, real, exp, sqrt, abs, sum
+from numpy import pi, log2, real, exp, sqrt, abs, sum, diag
 from numpy.linalg import det, cholesky as chol
 
 np.random.seed(13)
@@ -27,9 +27,14 @@ for u_id in range(U):
 # Construct analog precoder
 M_total = sum(mu_set)
 A_mat = np.zeros(shape=[Nt, M_total], dtype='complex')
+for u_id in range(U):
+    mu = mu_set[u_id]
 
-print(A_mat)
+    A_u = np.mat(a_resp_mat(aod_set[u_id, 0:mu], Nt) / sqrt(Nt))
+    A_u = A_u * np.mat(diag(wu_set[u_id]))
+    A_mat[:, sum(mu_set[0:u_id]):sum(mu_set[0:u_id])+mu] = A_u
 
+print(fnorm2(A_mat))
 
 
 

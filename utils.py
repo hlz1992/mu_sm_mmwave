@@ -112,6 +112,8 @@ def gen_mu_mmwave_chans(U, Nch, Nt, Nr_set, aoa_set, aod_set):
 
     return H_mat, P_mat, Lam_mat, Q_mat
         
+def fnorm2(M):
+    return np.sum(np.real(np.abs(M)**2))
 
 
 
