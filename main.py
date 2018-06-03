@@ -16,6 +16,7 @@ U = 4       # No. RF chains
 Nch = 5     # No. channel paths
 Nrf = U     # No. RF chains
 Nr_set = np.array([1, 2, 4, 8])[0:U]     # Users' receive antennas
+Nr_total = sum(Nr_set)
 
 # Generate channel matrix
 aoa_set, aod_set = gen_aoas_aods(U, Nch)            # AoAs & AoDs for each user and each path
@@ -46,4 +47,6 @@ T_mat = power(abs(Q_mat.H * A_mat), 2)
 
 # Analog-domain channel
 HA_mat = H_mat * A_mat
+print(HA_mat.shape)
+print(Nr_total, M_total)
 
