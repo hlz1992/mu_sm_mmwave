@@ -25,7 +25,10 @@ for u_id in range(U):
     wu_set[u_id] = np.ones(shape=[mu]) / sqrt(U * mu)
 
 # Construct analog precoder
-    
+M_total = sum(mu_set)
+A_mat = np.zeros(shape=[Nt, M_total], dtype='complex')
+
+print(A_mat)
 
 
 
