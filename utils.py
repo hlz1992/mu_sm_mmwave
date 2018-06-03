@@ -45,7 +45,7 @@ def c_gauss_0d(x, mu, sigma):
 
 def c_randn(n):
     # Generate 1-d standard normal distributed vector (i.i.d.)
-    res = np.random.randn(n)*np.sqrt(var/2) + 1j * np.random.randn(n)*np.sqrt(1/2)
+    res = np.random.randn(n)*np.sqrt(1/2) + 1j * np.random.randn(n)*np.sqrt(1/2)
     return res
 
 def c_randn_2d(ndim, nsample):
@@ -113,7 +113,7 @@ def gen_mu_mmwave_chans(U, Nch, Nt, Nr_set, aoa_set, aod_set):
     return H_mat, P_mat, Lam_mat, Q_mat
         
 def fnorm2(M):
-    return np.sum(np.real(np.abs(M)**2))
+    return np.sum(np.real(np.power(np.abs(M), 2)))
 
 
 

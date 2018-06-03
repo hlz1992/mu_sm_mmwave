@@ -1,8 +1,12 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from utils import *
-from numpy import pi, log2, real, exp, sqrt, abs, sum, diag
+from numpy import pi, log2, real, exp, sqrt, abs, sum, diag, power
 from numpy.linalg import det, cholesky as chol
+
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.colors import LogNorm
+import matplotlib.pyplot as plt
 
 np.random.seed(13)
 
@@ -22,11 +26,11 @@ mu_set = np.array([1, 2, 2, 4])[0:U]    # Users' hyper-RF chain number
 wu_set = dict()                         # User weights set
 for u_id in range(U):
     mu = mu_set[u_id]
-    wu_set[u_id] = np.ones(shape=[mu]) / sqrt(U * mu)
+    wu_set[u_id] = np.ones(shape=[mu]) / sqrt(U)
 
 # Construct analog precoder
 M_total = sum(mu_set)
-A_mat = np.zeros(shape=[Nt, M_total], dtype='complex')
+A_mat = np.mat(np.zeros(shape=[Nt, M_total], dtype='complex'))
 for u_id in range(U):
     mu = mu_set[u_id]
 
@@ -34,9 +38,12 @@ for u_id in range(U):
     A_u = A_u * np.mat(diag(wu_set[u_id]))
     A_mat[:, sum(mu_set[0:u_id]):sum(mu_set[0:u_id])+mu] = A_u
 
-print(fnorm2(A_mat))
+T_mat = power(abs(Q_mat.H * A_mat), 2)
+# Z = T_mat/T_mat.max()
+# print(Z)
+# plt.matshow(Z)
+# plt.show()
 
-
-
-
+# Analog-domain channel
+HA_mat = H_mat * A_mat
 
