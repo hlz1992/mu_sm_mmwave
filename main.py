@@ -2,7 +2,6 @@ import numpy as np
 from utils import *
 from numpy import pi, log2, real, exp, sqrt, abs, sum, mean, diag, power
 from numpy.linalg import det, cholesky as chol
-
 import matplotlib.pyplot as plt
 
 np.random.seed(13)
@@ -48,15 +47,10 @@ for u_id in range(U):
 # Equivalent channel
 G_mat = H_mat * P_mat
 Gu_set = dict()
-T_mat = np.zeros(shape=[U, U])
 for u_id in range(U):
     Nu = Nr_set[u_id]
     Mu = Mu_set[u_id]
-
     Gu_set[u_id] = G_mat[sum(Nr_set[0:u_id]):sum(Nr_set[0:u_id])+Nu, sum(Mu_set[0:u_id]):sum(Mu_set[0:u_id])+Mu]
-
-    for u2_id in range(U):
-        T_mat[u_id, u2_id] = fnorm2(G_mat[sum(Nr_set[0:u_id]):sum(Nr_set[0:u_id])+Nu, sum(Mu_set[0:u2_id])]) / Nu
 
 # Calculate accurate per-user mutual information
 # Part-I: Single-antenna MI
