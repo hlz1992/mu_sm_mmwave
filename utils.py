@@ -81,7 +81,9 @@ def gen_aoas_aods(U, Nch):
 def gen_mu_mmwave_chans(U, Nch, Nt, Nr_set, aoa_set, aod_set):
     # Generate multi-user mmWave-MIMO channel matrix
     gain_vars = np.array([0.1**w for w in range(Nch)])
-    path_gain_set = np.dot(c_randn_2d(U, Nch), np.diag(np.sqrt(gain_vars)))
+
+    path_gain_set = np.dot(np.ones(shape=[U, Nch]), np.diag(np.sqrt(gain_vars)))
+    # path_gain_set = np.dot(c_randn_2d(U, Nch), np.diag(np.sqrt(gain_vars)))
     
     Lam_mat = np.mat(np.diag(np.reshape(path_gain_set, U*Nch)))
 
