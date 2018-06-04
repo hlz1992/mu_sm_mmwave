@@ -16,8 +16,9 @@ Nr_set = np.array([1, 2, 4, 8])[0:U]     # Users' receive antennas
 Nr_total = sum(Nr_set)
 
 # Generate channel matrix
+dec_fac = 0.8   # Path gain decaying factor
 aoa_set, aod_set = gen_aoas_aods(U, Nch)            # AoAs & AoDs for each user and each path
-H_mat, P_mat, Lam_mat, Q_mat = gen_mu_mmwave_chans(U, Nch, Nt, Nr_set, aoa_set, aod_set)    # Multi-user mmWave channel matrix
+H_mat, P_mat, Lam_mat, Q_mat = gen_mu_mmwave_chans(dec_fac, U, Nch, Nt, Nr_set, aoa_set, aod_set)    # Multi-user mmWave channel matrix
 
 # Construct analog & digital precoder
 # Step 1: Determine hyper-RF-chain number for each user
@@ -38,7 +39,7 @@ P_mat = np.mat(np.zeros(shape=[Nt, M_total], dtype='complex'))
 for u_id in range(U):
     Mu = Mu_set[u_id]
 
-    A_prc_set[u_id] = np.mat(a_resp_mat(aod_set[u_id, 0:Mu], Nt)) / sqrt(Nt)
+    A_prc_set[u_id] = np.mat(a_resp_mat(aod_set[u_id, 0:Mu], Nt))/sqrt(Nt)
     D_prc_set[u_id] = np.mat(diag(wu_set[u_id]))
     P_prc_set[u_id] = A_prc_set[u_id] * D_prc_set[u_id]
 
@@ -64,14 +65,13 @@ sa_mi_pfm = np.zeros(shape=[U, len(snr_db_rng)])
 sa_ami_pfm = np.zeros_like(snr_db_rng)
 for snr_id in range(len(snr_db_rng)):
     N0 = 10**(-snr_db_rng[snr_id]/10)
-
     for u_id in range(U):
         sa_mi_pfm[u_id, snr_id] = sa_mut_inf(Gu_set[u_id][:, 0], N0)
         sa_ami_pfm[snr_id] += sa_mi_pfm[u_id, snr_id] / U
 
-# for u_id in range(U):
-#     plt.plot(snr_db_rng, sa_mi_pfm[u_id, :], '-', label='SA-user {0}'.format(u_id))
-plt.plot(snr_db_rng, sa_ami_pfm, 'k-', label='sa-mean')
+for u_id in range(U):
+    plt.plot(snr_db_rng, sa_mi_pfm[u_id, :], '-', label='SA-user {0}'.format(u_id))
+plt.plot(snr_db_rng, sa_ami_pfm, 'ko-', label='sa-mean')
 
 # Part-II: Spatial-modulation MI
 sm_mi_pfm = np.zeros(shape=[U, len(snr_db_rng)])
@@ -79,15 +79,14 @@ sm_ami_pfm = np.zeros_like(snr_db_rng)
 
 for snr_id in range(len(snr_db_rng)):
     N0 = 10**(-snr_db_rng[snr_id]/10)
-
     for u_id in range(U):
         Gu = Gu_set[u_id]
         sm_mi_pfm[u_id, snr_id], _, _ = sm_mut_inf(Gu, N0)
         sm_ami_pfm[snr_id] += sm_mi_pfm[u_id, snr_id] / U
 
-# for u_id in range(U):
-#     plt.plot(snr_db_rng, sm_mi_pfm[u_id, :], '--', label='SM-user {0}'.format(u_id))
-plt.plot(snr_db_rng, sm_ami_pfm, 'k--', label='sm-mean')
+for u_id in range(U):
+    plt.plot(snr_db_rng, sm_mi_pfm[u_id, :], '--', label='SM-user {0}'.format(u_id))
+plt.plot(snr_db_rng, sm_ami_pfm, 'kx--', label='sm-mean')
 
 # Picture
 plt.legend()
