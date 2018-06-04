@@ -35,18 +35,15 @@ A_mat = np.mat(np.zeros(shape=[Nt, M_total], dtype='complex'))
 for u_id in range(U):
     mu = mu_set[u_id]
 
-    A_u = np.mat(a_resp_mat(aod_set[u_id, 0:mu], Nt) / sqrt(Nt))
-    A_u = A_u * np.mat(diag(wu_set[u_id]))
+    A_u = np.mat(a_resp_mat(aod_set[u_id, 0:mu], Nt))
+    A_u = A_u * np.mat(diag(wu_set[u_id])) / sqrt(Nt)
     A_mat[:, sum(mu_set[0:u_id]):sum(mu_set[0:u_id])+mu] = A_u
 
 T_mat = power(abs(Q_mat.H * A_mat), 2)
-# Z = T_mat/T_mat.max()
-# print(Z)
-# plt.matshow(Z)
-# plt.show()
+Z = T_mat
+plt.matshow(Z)
+plt.show()
 
 # Analog-domain channel
 HA_mat = H_mat * A_mat
-print(HA_mat.shape)
-print(Nr_total, M_total)
 
