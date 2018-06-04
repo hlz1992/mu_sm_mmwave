@@ -1,6 +1,6 @@
 import numpy as np
 from utils import *
-from numpy import pi, log2, real, exp, sqrt, abs, sum, diag, power
+from numpy import pi, log2, real, exp, sqrt, abs, sum, mean, diag, power
 from numpy.linalg import det, cholesky as chol
 
 from mpl_toolkits.mplot3d import Axes3D
@@ -50,14 +50,60 @@ for u_id in range(U):
 # Equivalent channel
 G_mat = H_mat * P_mat
 Gu_set = dict()
+T_mat = np.zeros(shape=[U, U])
 for u_id in range(U):
     Nu = Nr_set[u_id]
     Mu = Mu_set[u_id]
 
     Gu_set[u_id] = G_mat[sum(Nr_set[0:u_id]):sum(Nr_set[0:u_id])+Nu, sum(Mu_set[0:u_id]):sum(Mu_set[0:u_id])+Mu]
 
-# print([a.shape for a in Gu_set.values()])
+    for u2_id in range(U):
+        T_mat[u_id, u2_id] = fnorm2(G_mat[sum(Nr_set[0:u_id]):sum(Nr_set[0:u_id])+Nu, sum(Mu_set[0:u2_id])]) / Nu
 
 # Calculate accurate per-user mutual information
+# Part-I: Single-antenna MI
+snr_db_rng = np.linspace(-20, 20, 20)
+sa_mi_pfm = np.zeros(shape=[U, len(snr_db_rng)])
+sa_ami_pfm = np.zeros_like(snr_db_rng)
+for snr_id in range(len(snr_db_rng)):
+    N0 = 10**(-snr_db_rng[snr_id]/10)
+
+    for u_id in range(U):
+        Nu = Nr_set[u_id]
+        h_sa = Gu_set[u_id][:, 0]
+        sa_mi_pfm[u_id, snr_id] = log2(real(det(np.eye(Nu) + h_sa*h_sa.H / N0)))
+        sa_ami_pfm[snr_id] += sa_mi_pfm[u_id, snr_id] / U
+
+# for u_id in range(U):
+#     plt.plot(snr_db_rng, sa_mi_pfm[u_id, :], '-', label='user {0}'.format(u_id))
+plt.plot(snr_db_rng, sa_ami_pfm, 'k-', label='sa-mean')
+
+# Part-II: Spatial-modulation MI
+sm_mi_pfm = np.zeros(shape=[U, len(snr_db_rng)])
+sm_ami_pfm = np.zeros_like(snr_db_rng)
+for snr_id in range(len(snr_db_rng)):
+    N0 = 10**(-snr_db_rng[snr_id]/10)
+
+    for u_id in range(U):
+        Nu = Nr_set[u_id]
+        Mu = Mu_set[u_id]
+        Gu = Gu_set[u_id]
+        
+        sym_dm_mi = mean([log2(real(det(np.eye(Nu) + Gu[:, col_id]*Gu[:, col_id].H / N0))) for col_id in range(Mu)])
+
+        # spt_dm_mi = log2(Mu)
+        spt_dm_mi = 0
+
+        sm_mi_pfm[u_id, snr_id] = sym_dm_mi + spt_dm_mi
+        sm_ami_pfm[snr_id] += sm_mi_pfm[u_id, snr_id] / U
+
+plt.plot(snr_db_rng, sm_ami_pfm, 'k--', label='sm-mean')
+
+# Picture
+plt.legend()
+plt.xlabel('SNR (dB)')
+plt.ylabel('Mutual Information (bits/s/Hz)')
+plt.grid()
+plt.show()
 
 
