@@ -23,7 +23,6 @@ def c_gauss_2d(x, mu_vec, sig_mat):
     res = 1/(np.pi**ndim * np.real(np.linalg.det(sig_mat))) * np.exp(-np.real(np.diag((x-mu_vec).H * sig_mat.I * (x-mu_vec))))
     return res
 
-
 def c_gauss_1d(x, mu_vec, sig_mat):
     # Generate complex-valued multivariate Gaussian PDF using col-vector-like x, mu_vec & sig_mat
     if ~isinstance(x, np.matrix):
@@ -82,9 +81,8 @@ def gen_mu_mmwave_chans(U, Nch, Nt, Nr_set, aoa_set, aod_set):
     # Generate multi-user mmWave-MIMO channel matrix
     gain_vars = np.array([0.1**w for w in range(Nch)])
 
-    # path_gain_set = np.dot(np.ones(shape=[U, Nch]), np.diag(np.sqrt(gain_vars)))
-    # path_gain_set = np.dot(c_randn_2d(U, Nch), np.diag(np.sqrt(gain_vars)))
-    path_gain_set = np.ones(shape=[U, Nch])
+    path_gain_set = np.dot(c_randn_2d(U, Nch), np.diag(np.sqrt(gain_vars)))
+    # path_gain_set = np.ones(shape=[U, Nch])
     
     Lam_mat = np.mat(np.diag(np.reshape(path_gain_set, U*Nch)))
 
@@ -118,9 +116,31 @@ def gen_mu_mmwave_chans(U, Nch, Nt, Nr_set, aoa_set, aod_set):
 def fnorm2(M):
     return np.sum(np.real(np.power(np.abs(M), 2)))
 
+def sa_mut_inf(h, N0):
+    # Calculate single-TA multi-RA system's mutual information
+    return np.log2(np.real(np.linalg.det(np.eye(len(h)) + np.mat(h) * np.mat(h).H / N0)))
 
+def sm_mut_inf(G, N0):
+    if ~isinstance(G, np.matrix):
+        G = np.mat(G)
 
+    N, M = G.shape
+    sym_dm_mi = np.mean([np.log2(np.real(np.linalg.det(np.eye(N) + G[:, col_id]*G[:, col_id].H / N0))) for col_id in range(M)])
 
+    sig_mat_set = dict()
+    for id_m in range(M):
+        sig_mat_set[id_m] = np.mat(N0*np.eye(N) + G[:, id_m]*G[:, id_m].H)
+    
+    spt_dm_mi_theo = 0
+    for id_n in range(M):
+        temp = 0
+        for id_t in range(M):
+            temp += np.real(np.linalg.det(sig_mat_set[id_n])) / np.real(np.linalg.det(sig_mat_set[id_n] + sig_mat_set[id_t]))
+        
+        spt_dm_mi_theo += np.log2(temp)
+    spt_dm_mi_theo = np.log2(M) - N - 1/M * spt_dm_mi_theo
+
+    return sym_dm_mi+spt_dm_mi_theo, sym_dm_mi, spt_dm_mi_theo
 
 
     
