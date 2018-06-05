@@ -32,5 +32,5 @@ for id_Mu in range(len(Mu_rng)):
     sm_pfm[id_Mu], _, _ = sm_mut_inf(G_mat, N0)
 
 print(sm_pfm)
-plt.stem(sm_pfm)
+plt.plot(sm_pfm, 'o-')
 plt.show()
