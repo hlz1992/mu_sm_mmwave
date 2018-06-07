@@ -88,5 +88,3 @@ plt.xlabel('SNR (dB)')
 plt.ylabel('Mutual Information (bits/s/Hz)')
 plt.grid()
 plt.show()
-
-
