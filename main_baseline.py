@@ -22,6 +22,8 @@ dec_fac = 0.8   # Path gain decaying factor
 aoa_set, aod_set = gen_aoas_aods(U, Nch)            # AoAs & AoDs for each user and each path
 H_mat, P_mat, Lam_mat, Q_mat = gen_mu_mmwave_chans(dec_fac, U, Nch, Nt, Nr_set, aoa_set, aod_set)    # Multi-user mmWave channel matrix
 
+snr_db_rng = np.linspace(-20, 10, 20)
+
 # Step 1: Design analog precoder
 A_prc_mat = np.mat(np.zeros(shape=[Nt, U], dtype='complex'))
 for u_id in range(U):
@@ -45,7 +47,6 @@ else:
 T_mat = G_mat * D_prc_mat
 
 # Step 3: Calculate per-user data rate
-snr_db_rng = np.linspace(-30, 0, 20)
 bl_mi_pfm = np.zeros(shape=[U, len(snr_db_rng)])
 bl_ami_pfm = np.zeros_like(snr_db_rng)
 for snr_id in range(len(snr_db_rng)):

@@ -60,6 +60,9 @@ def a_resp_vec(phi, n):
     return a_vec
 
 def a_resp_mat(phi_set, n):
+    if np.array(phi_set).shape == ():
+        return a_resp_vec(phi_set, n)
+
     a_mat = np.zeros(shape=[n, len(phi_set)], dtype='complex')
     for i in range(len(phi_set)):
         a_mat[:, i] = a_resp_vec(phi_set[i], n)
