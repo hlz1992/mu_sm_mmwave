@@ -16,7 +16,7 @@ Nr_set = np.array([1, 2, 4, 8])[0:U]     # Users' receive antennas
 Nr_total = sum(Nr_set)
 
 # Generate channel matrix
-dec_fac = 0.8   # Path gain decaying factor
+dec_fac = 0.7   # Path gain decaying factor
 aoa_set, aod_set = gen_aoas_aods(U, Nch)            # AoAs & AoDs for each user and each path
 H_mat, P_mat, Lam_mat, Q_mat = gen_mu_mmwave_chans(dec_fac, U, Nch, Nt, Nr_set, aoa_set, aod_set)    # Multi-user mmWave channel matrix
 
@@ -57,6 +57,7 @@ for snr_id in range(len(snr_db_rng)):
         A_prc = np.mat(a_resp_mat(aod_set[u_id, 0:mu], Nt))/sqrt(Nt)
         D_prc = np.mat(np.eye(mu)) / sqrt(U)
         temp = A_prc * D_prc
+
         P_mat[:, sum(mu_set[0:u_id]):sum(mu_set[0:u_id])+mu] = A_prc * D_prc
     
     G_mat = H_mat * P_mat
@@ -64,9 +65,11 @@ for snr_id in range(len(snr_db_rng)):
         nu = Nr_set[u_id]
         mu = mu_set[u_id]
         Gu = G_mat[sum(Nr_set[0:u_id]):sum(Nr_set[0:u_id])+nu, sum(mu_set[0:u_id]):sum(mu_set[0:u_id])+mu]
-        N1 = N0 + (fnorm2(G_mat[sum(Nr_set[0:u_id]):sum(Nr_set[0:u_id])+nu, :]) - fnorm2(Gu)) / nu / (m_total-mu)
+        N1 = N0 + (fnorm2(G_mat[sum(Nr_set[0:u_id]):sum(Nr_set[0:u_id])+nu, :]) - fnorm2(Gu)) / nu / (m_total-mu) * (U-1)
         sm_mi_pfm[u_id, snr_id] = sa_mut_inf(Gu, N1)
         sm_ami_pfm[snr_id] += sm_mi_pfm[u_id, snr_id] / U
+
+np.savetxt('sm_ami_pfm.csv', sm_ami_pfm, delimiter=',')
 
 for u_id in range(U):
     plt.plot(snr_db_rng, sm_mi_pfm[u_id, :], '-', label='SM-user {0}'.format(u_id))
@@ -76,5 +79,6 @@ plt.legend()
 plt.xlabel('SNR (dB)')
 plt.ylabel('Mutual Information (bits/s/Hz)')
 plt.grid()
-plt.show()
+# plt.show()
+
 

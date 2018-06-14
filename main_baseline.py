@@ -18,7 +18,7 @@ Nr_total = sum(Nr_set)
 D_prc_sw = True
 
 # Generate channel matrix
-dec_fac = 0.8   # Path gain decaying factor
+dec_fac = 0.7   # Path gain decaying factor
 aoa_set, aod_set = gen_aoas_aods(U, Nch)            # AoAs & AoDs for each user and each path
 H_mat, P_mat, Lam_mat, Q_mat = gen_mu_mmwave_chans(dec_fac, U, Nch, Nt, Nr_set, aoa_set, aod_set)    # Multi-user mmWave channel matrix
 
@@ -36,13 +36,13 @@ G_mat = H_mat * A_prc_mat # Equivalent channel
 if D_prc_sw and max(Nr_set) == 1:
     print('Not: Digital precoder is ON.')
     D_prc_mat = G_mat.H * (G_mat * G_mat.H).I
-    D_prc_mat = D_prc_mat / sqrt(fnorm2(D_prc_mat)) * sqrt(U)
+    D_prc_mat = D_prc_mat / sqrt(fnorm2(D_prc_mat))
 elif D_prc_sw and max(Nr_set) > 1:
     print('Warning: Digital precoder is OFF due to multiple RAs.')
-    D_prc_mat = np.eye(U)
+    D_prc_mat = np.eye(U) / sqrt(U)
 else:
     print('Warning: Digital precoder is OFF due to off-switch.')
-    D_prc_mat = np.eye(U)
+    D_prc_mat = np.eye(U) / sqrt(U)
 
 T_mat = G_mat * D_prc_mat
 
@@ -64,6 +64,10 @@ for u_id in range(U):
     plt.plot(snr_db_rng, bl_mi_pfm[u_id, :], '-', label='BL-user {0}'.format(u_id))
 
 plt.plot(snr_db_rng, bl_ami_pfm, 'ko-', label='bl-mean')
+
+sm_ami_pfm = np.loadtxt('sm_ami_pfm.csv', delimiter=',')
+plt.plot(snr_db_rng, sm_ami_pfm, 'bx-', label='SM-mean')
+
 plt.legend()
 plt.xlabel('SNR (dB)')
 plt.ylabel('Mutual Information (bits/s/Hz)')
