@@ -8,7 +8,7 @@ np.random.seed(13)
 
 # Basic configurations
 Nt = 64     # No. transmit antennas
-U = 4       # No. RF chains
+U = 4       # No. RF chains & users
 Nch = 5     # No. channel paths
 Nrf = U     # No. RF chains
 Nr_set = np.array([1, 2, 4, 8])[0:U]     # Users' receive antennas
