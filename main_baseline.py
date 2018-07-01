@@ -63,7 +63,7 @@ for snr_id in range(len(snr_db_rng)):
 for u_id in range(U):
     plt.plot(snr_db_rng, bl_mi_pfm[u_id, :], '-', label='BL-user {0}'.format(u_id))
 
-plt.plot(snr_db_rng, bl_ami_pfm, 'ko-', label='bl-mean')
+plt.plot(snr_db_rng, bl_ami_pfm, 'ko-', label='BL-mean')
 
 sm_ami_pfm = np.loadtxt('sm_ami_pfm.csv', delimiter=',')
 plt.plot(snr_db_rng, sm_ami_pfm, 'bx-', label='SM-mean')
