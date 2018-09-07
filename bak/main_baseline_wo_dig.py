@@ -1,5 +1,13 @@
+#######################################################################
+# 
+#   @author: Longzhuang He
+#   @descrp: Baseline wwave system with NO digital precoding
+#
+#######################################################################
+
+
 import numpy as np
-from utils import *
+from mmwave_utils import *
 from numpy import pi, log2, real, exp, sqrt, abs, sum, mean, diag, power, min, max, argmin, argmax
 from numpy.linalg import det, cholesky as chol
 import matplotlib.pyplot as plt
@@ -12,10 +20,7 @@ U = 4       # No. RF chains & users
 Nch = 5     # No. channel paths
 Nrf = U     # No. RF chains
 Nr_set = np.array([1, 2, 4, 8])[0:U]     # Users' receive antennas
-# Nr_set = np.array([1, 1, 1, 1])[0:U]     # Users' receive antennas
 Nr_total = sum(Nr_set)
-
-D_prc_sw = True
 
 # Generate channel matrix
 dec_fac = 0.7   # Path gain decaying factor
@@ -33,16 +38,7 @@ for u_id in range(U):
 G_mat = H_mat * A_prc_mat # Equivalent channel
 
 # Step 2: Design digital precoder
-if D_prc_sw and max(Nr_set) == 1:
-    print('Not: Digital precoder is ON.')
-    D_prc_mat = G_mat.H * (G_mat * G_mat.H).I
-    D_prc_mat = D_prc_mat / sqrt(fnorm2(D_prc_mat))
-elif D_prc_sw and max(Nr_set) > 1:
-    print('Warning: Digital precoder is OFF due to multiple RAs.')
-    D_prc_mat = np.eye(U) / sqrt(U)
-else:
-    print('Warning: Digital precoder is OFF due to off-switch.')
-    D_prc_mat = np.eye(U) / sqrt(U)
+D_prc_mat = np.eye(U) / sqrt(U)
 
 T_mat = G_mat * D_prc_mat
 
